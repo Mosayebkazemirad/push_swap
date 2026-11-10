@@ -6,7 +6,7 @@
 /*   By: mkazemir <mkazemir@learner.42.tech>       #+#  +:+       +#+         */
 /*                                               +#+#+#+#+#+   +#+            */
 /*   Created: 2026/11/04 09:20:53 by mkazemir         #+#    #+#              */
-/*   Updated: 2026/11/09 13:42:27 by mkazemir        ###   ########.fr        */
+/*   Updated: 2026/11/10 08:37:10 by mkazemir        ###   ########.fr        */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,11 @@ int	main(int argc, char **argv)
 	get_ranked(stack_a);
 	size = (int) calc_size(stack_a);
 	if (size <= 3)
-		simple_algo(&stack_a, &stack_b);
+		simple_algo(&stack_a, &stack_b, size);
 	else if (size <= 100)
-		medium_algo(&stack_a, &stack_b);
+		medium_algo(&stack_a, &stack_b, size);
 	else
-		complex_algo(&stack_a, &stack_b);
+		complex_algo(&stack_a, &stack_b, size);
 	stack_b = NULL;
 	return (0);
 }

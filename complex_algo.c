@@ -1,27 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   complex_algo.c                                     :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: gkudelka <gkudelka@learner.42.tech>        +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/11/07 14:36:17 by gkudelka          #+#    #+#             */
-/*   Updated: 2026/11/07 14:36:25 by gkudelka         ###   ########.fr       */
+/*                                                       :::      ::::::::    */
+/*   complex_algo.c                                    :+:      :+:    :+:    */
+/*                                                   +:+ +:+         +:+      */
+/*   By: mkazemir <mkazemir@learner.42.tech>       #+#  +:+       +#+         */
+/*                                               +#+#+#+#+#+   +#+            */
+/*   Created: 2026/11/07 14:36:17 by mkazemir         #+#    #+#              */
+/*   Updated: 2026/11/10 08:39:34 by mkazemir        ###   ########.fr        */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-void	complex_algo(t_stack **a, t_stack **b)
+void	complex_algo(t_stack **a, t_stack **b, int size)
 {
 	int	bit;
 	int	i;
-	int	size;
 
 	if (!a || !b || !*a || is_sorted(*a))
 		return ;
-	get_ranked(*a);
-	size = (int)calc_size(*a);
 	bit = 0;
 	while ((size - 1) >> bit)
 	{

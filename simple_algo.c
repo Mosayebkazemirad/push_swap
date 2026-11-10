@@ -12,16 +12,13 @@
 
 #include "push_swap.h"
 
-void	simple_algo(t_stack **a, t_stack **b)
+void	simple_algo(t_stack **a, t_stack **b,int size)
 {
 	int	rota;
 	int	rank;
-	int	size;
-
+	
 	if (!a || !b || !*a || is_sorted(*a))//0 1 2 3 4
 		return ; 
-	get_ranked(*a); //????
-	size = (int)calc_size(*a);
 	rank = 0;
 	while (rank < size)
 	{

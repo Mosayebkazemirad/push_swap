@@ -27,7 +27,6 @@ int	main(int argc, char **argv)
 	{
 		return (0);
 	};
-	get_ranked(stack_a);
 	size = (int) calc_size(stack_a);
 	if (size <= 3)
 		simple_algo(&stack_a, &stack_b, size);

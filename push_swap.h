@@ -51,9 +51,9 @@ void	ft_putstr(char *s);
 /* Ranking and Sorting */
 void	get_ranked(t_stack *stack);
 int		is_sorted(t_stack *stack);
-void	simple_algo(t_stack **a, t_stack **b,int size);
-void	medium_algo(t_stack **a, t_stack **b,int size);
-void	complex_algo(t_stack **a, t_stack **b,int size);
+void	simple_algo(t_stack **a, t_stack **b);
+void	medium_algo(t_stack **a, t_stack **b);
+void	complex_algo(t_stack **a, t_stack **b);
 void	restore_a(t_stack **a, t_stack **b, int size);
 void	restore_binary(t_stack **a, t_stack **b);
 

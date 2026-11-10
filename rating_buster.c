@@ -24,10 +24,10 @@ void	get_ranked(t_stack *stack)
 	while (current)
 	{
 		rank = 0;
-		compare = stack->next; /*vieleicht beeser compare = stack->next; */
+		compare = stack;
 		while (compare)
 		{
-			if (compare->n < current->n) // 3 4 1 5 9 7
+			if (compare->n < current->n)
 				rank++;
 			compare = compare->next;
 		}

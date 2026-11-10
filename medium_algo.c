@@ -53,13 +53,16 @@ static void	push_chunk(t_stack **a, t_stack **b, int min_rank,
 	}
 }
 
-void	medium_algo(t_stack **a, t_stack **b,int size)
+void	medium_algo(t_stack **a, t_stack **b)
 {
 	int	chunk_size;
+	int	size;
 	int	min_rank;
 
 	if (!a || !b || !*a || is_sorted(*a))
 		return ;
+	get_ranked(*a);
+	size = (int)calc_size(*a);
 	chunk_size = get_chunk_size(size);
 	min_rank = 0;
 	while (min_rank < size)

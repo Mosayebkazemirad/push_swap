@@ -59,4 +59,3 @@ void	restore_binary(t_stack **a, t_stack **b)
 	while (*b)
 		pa(a, b);
 }
-mosaunbd

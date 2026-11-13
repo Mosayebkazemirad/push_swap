@@ -6,32 +6,17 @@
 /*   By: mkazemir <mkazemir@learner.42.tech>       #+#  +:+       +#+         */
 /*                                               +#+#+#+#+#+   +#+            */
 /*   Created: 2026/11/04 09:20:53 by mkazemir         #+#    #+#              */
-/*   Updated: 2026/11/10 11:35:21 by mkazemir        ###   ########.fr        */
+/*   Updated: 2026/11/13 12:22:16 by mkazemir        ###   ########.fr        */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-#include "push_swap.h"
-
-static void	free_stack(t_stack **stack)
-{
-	t_stack	*temp;
-
-	if (!stack || !*stack)
-		return ;
-	while (*stack)
-	{
-		temp = *stack;
-		*stack = (*stack)->next;
-		free(temp);
-	}
-}
-
 static void	select_algo(t_stack **a, t_stack **b, int size)
 {
 	if (size <= 3)
-		simple_algo(a, b);/*5 möglichkeiten 132 213 231 312 312 */
+		simple_algo(a, b);
+	/*5 möglichkeiten 132 213 231 312 312 */
 	else if (size <= 5)
 		sort_five(a, b);
 	else if (size <= 100)
@@ -51,8 +36,9 @@ int	main(int argc, char **argv)
 	stack_a = input_check(argc, argv);
 	if (!stack_a)
 		return (1);
+	get_ranked(stack_a);
 	if (!is_sorted(stack_a))
-		select_algo(&stack_a, &stack_b, (int)calc_size(stack_a));
+		select_algo(&stack_a, &stack_b, (int) calc_size(stack_a));
 	free_stack(&stack_a);
 	free_stack(&stack_b);
 	return (0);

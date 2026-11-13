@@ -12,28 +12,48 @@
 
 #include "push_swap.h"
 
-void	simple_algo(t_stack **a, t_stack **b)
+static int	find_rank_pos(t_stack *a, int target_rank)
 {
-	int	rota;
-	int	rank;
+	int	pos;
+
+	pos = 0;
+	while (a)
+	{
+		if (a->rank == target_rank)
+			return (pos);
+		pos++;
+		a = a->next;
+	}
+	return (0);
+}
+
+static void	push_smallest_to_b(t_stack **a, t_stack **b, int target_rank)
+{
+	int	pos;
 	int	size;
 
-	if (!a || !b || !*a || is_sorted(*a))
-		return ;
-	get_ranked(*a);
 	size = (int)calc_size(*a);
-	rank = 0;
-	while (rank < size)
+	pos = find_rank_pos(*a, target_rank);
+	if (pos <= size / 2)
+		while ((*a)->rank != target_rank)
+			ra(a);
+	else
+		while ((*a)->rank != target_rank)
+			rra(a);
+	pb(a, b);
+}
+
+void	sort_five(t_stack **a, t_stack **b)
+{
+	int	target;
+
+	target = 0;
+	while (calc_size(*a) > 3)
 	{
-		rota = calc_rota(*a, rank);
-		if (rota > 0)
-			call_ra(a, rota);
-		else if (rota < 0)
-			call_rra(a, -rota);
-		pb(a, b);
-		rank++;
+		push_smallest_to_b(a, b, target);
+		target++;
 	}
+	simple_algo(a, b);
 	while (*b)
 		pa(a, b);
 }
-

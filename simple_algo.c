@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "push_swap.h"
+
 static void	sort_three_cases(t_stack **a, int f, int s, int t)
 {
 	if (f > s && s < t && f < t) // 2 1 3 with sa = 123 321

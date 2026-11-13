@@ -23,7 +23,6 @@ typedef struct s_stack
 	int				n;
 	int				rank;
 	struct s_stack	*next;
-	struct  s_stack *previous;
 }	t_stack;
 
 /* Initialization and Parsing */
@@ -49,7 +48,7 @@ long	ft_atoi(const char *nptr);
 void	ft_putstr(char *s);
 
 /* Ranking and Sorting */
-
+void	sort_five(t_stack **a, t_stack **b);
 void	get_ranked(t_stack *stack);
 int		is_sorted(t_stack *stack);
 void	simple_algo(t_stack **a, t_stack **b);

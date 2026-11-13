@@ -44,22 +44,6 @@ int	calc_rota(t_stack *stack, int rank)
 	return (index);
 }
 
-int	find_max_rank(t_stack *stack)
-{
-	int	max;
-
-	if (!stack)
-		return (-1);
-	max = stack->rank;
-	while (stack)
-	{
-		if (stack->rank > max)
-			max = stack->rank;
-		stack = stack->next;
-	}
-	return (max);
-}
-
 int	get_chunk_size(int n)
 {
 	int	size;
@@ -75,3 +59,4 @@ void	restore_binary(t_stack **a, t_stack **b)
 	while (*b)
 		pa(a, b);
 }
+mosaunbd

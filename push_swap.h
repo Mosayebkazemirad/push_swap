@@ -49,6 +49,7 @@ long	ft_atoi(const char *nptr);
 void	ft_putstr(char *s);
 
 /* Ranking and Sorting */
+
 void	get_ranked(t_stack *stack);
 int		is_sorted(t_stack *stack);
 void	simple_algo(t_stack **a, t_stack **b);
@@ -58,9 +59,9 @@ void	restore_a(t_stack **a, t_stack **b, int size);
 void	restore_binary(t_stack **a, t_stack **b);
 
 /* Sorting Utilities */
+void	free_stack(t_stack **stack);
 unsigned int	calc_size(t_stack *stack);
 int			calc_rota(t_stack *stack, int rank);
-int			find_max_rank(t_stack *stack);
 int			get_chunk_size(int n);
 void		call_ra(t_stack **a, int rota);
 void		call_rra(t_stack **a, int rota);

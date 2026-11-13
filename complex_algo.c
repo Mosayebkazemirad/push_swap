@@ -23,7 +23,7 @@ void	complex_algo(t_stack **a, t_stack **b)
 	get_ranked(*a);
 	size = (int)calc_size(*a);
 	bit = 0;
-	while ((size - 1) >> bit)
+	while ((size - 1) >> bit) // 4 3 1 2 11 11 1 10
 	{
 		i = 0;
 		while (i++ < size)

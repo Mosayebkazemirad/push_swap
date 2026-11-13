@@ -13,7 +13,7 @@
 #include "push_swap.h"
 
 /* Gibt den zugewiesenen Speicher für den gesamten Stack frei. */
-static void	free_stack(t_stack **stack)
+void	free_stack(t_stack **stack)
 {
 	t_stack	*tmp;
 	t_stack	*current;

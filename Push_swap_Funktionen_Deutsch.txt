@@ -1,0 +1,564 @@
+PUSH_SWAP - FUNKTIONSUEBERSICHT (DEUTSCH)
+======================================================================
+Basis: push_swap.zip  am 14.11.2026
+Umfang: 31 C-Dateien und 108 Funktionen.
+
+GRUNDPRINZIPIEN
+  Adaptive (Standard): Disorder <20% -> Simple; <50% -> Medium;
+                       sonst Complex. Flags erzwingen die Strategie.
+  Simple: LIS behalten, Rest mit guenstigen Rotationen einfuegen.
+  Medium: laengsten zusammenhaengenden Lauf behalten; begrenzter
+          Greedy-Versuch und bei Bedarf Chunk-Fallback.
+  Complex: rangbasierte halbierte Partitionierung zwischen A/B;
+           Ausgabebefehle werden am Ende sicher vereinfacht.
+  --bench: Rohbefehle -> Optimizer -> stdout; nur finale Befehle
+           werden gezaehlt; Statistik wird auf stderr ausgegeben.
+
+LEGENDE
+  [intern/static] = nur innerhalb der genannten C-Datei sichtbar.
+  [extern]        = in anderen C-Dateien aufrufbare Funktion.
+  Die Texte beschreiben die tatsaechliche Implementierung.
+
+======================================================================
+START UND ALGORITHMUSAUSWAHL
+======================================================================
+
+DATEI: push_swap.c
+------------------
+  is_strategy()   [intern/static]
+    Prueft, ob ein Argument genau eines der vier erlaubten Strategieflags (--simple,
+    --medium, --complex, --adaptive) ist.
+
+  select_strategy()   [intern/static]
+    Durchsucht argv nach Strategie- und --bench-Flags, entfernt diese in-place aus der
+    Argumentliste und lehnt mehrfach gesetzte Flags ab. Ohne Strategieflag bleibt Adaptive
+    voreingestellt.
+
+  main()   [extern]
+    Einstiegspunkt: liest Flags und Zahlen, initialisiert A/B, aktiviert bei Bedarf den
+    Benchmark, ruft den zentralen Dispatcher auf und gibt beide Stacks frei. Fehler landen
+    auf stderr.
+
+
+DATEI: sorting.c
+----------------
+  select_algo()   [intern/static]
+    Wählt den Strategiecode 1/2/3: ein erzwungener Modus hat Vorrang; Adaptive verwendet den
+    ungerundeten Disorder-Wert (<0,2 Simple; <0,5 Medium; sonst Complex).
+
+  run_strategy()   [intern/static]
+    Ruft anhand des gewählten Strategiecodes simple_ranked, medium_ranked oder
+    complex_ranked auf.
+
+  sort_stack()   [extern]
+    Zentraler Sortiereinstieg: weist Ränge zu, berechnet Disorder, speichert die Bench-
+    Auswahl, versucht Quickchecks und startet erst danach die gewählte Hauptstrategie.
+
+
+======================================================================
+PARSER UND LISTENVERWALTUNG
+======================================================================
+
+DATEI: check_input.c
+--------------------
+  free_stack()   [extern]
+    Gibt sämtliche Listenknoten eines Stacks frei und setzt den Kopf auf NULL. Wird auch
+    beim Beenden nach Parserfehlern verwendet.
+
+  parse_argument()   [intern/static]
+    Liest ein einzelnes argv-Argument, das mehrere durch Leerraum getrennte Zahlen enthalten
+    darf. Meldet Fehler bei leerem Argument oder einer ungültigen Zahl.
+
+  input_check()   [extern]
+    Verarbeitet alle Zahlenargumente nach der Flag-Auswahl und baut die verkettete Liste für
+    Stack A auf.
+
+
+DATEI: parse_numbers.c
+----------------------
+  ps_is_space()   [extern]
+    Erkennt Leerzeichen und ASCII-Whitespace (Tabulator, Zeilenumbruch usw.) als gültige
+    Trenner.
+
+  read_digits()   [intern/static]
+    Liest die Ziffern einer Zahl und prüft vor jedem Rechenschritt, ob die Grenze des
+    32-Bit-Integerbereichs überschritten würde. Setzt anschließend das Vorzeichen.
+
+  ps_read_number()   [extern]
+    Liest ein optionales + oder - und eine gültige 32-Bit-Ganzzahl; akzeptiert INT_MIN und
+    INT_MAX. Danach darf nur Leerraum oder das Argumentende folgen.
+
+
+DATEI: parse_stack.c
+--------------------
+  ps_input_error()   [extern]
+    Gibt bereits angelegte Listenelemente frei, schreibt Error auf stderr und beendet das
+    Programm mit Fehlerstatus.
+
+  ps_append_number()   [extern]
+    Prüft die bestehenden Knoten auf ein Duplikat, reserviert einen neuen Knoten mit rank =
+    -1 und hängt ihn ans Ende von A.
+
+
+======================================================================
+STACKOPERATIONEN UND AUSGABE
+======================================================================
+
+DATEI: libft.c
+--------------
+  ft_putstr()   [extern]
+    Zentraler stdout-Ausgabeweg für Stackbefehle. Bei aktivem Complex-Optimizer wird eine
+    geeignete Operation zunächst gepuffert; sonst wird sie gedruckt und für --bench gezählt.
+
+
+DATEI: push.c
+-------------
+  push()   [intern/static]
+    Interner Zeigerumbau: verschiebt den obersten Listenknoten eines Stacks auf die Spitze
+    des anderen, ohne Daten zu kopieren.
+
+  pa()   [extern]
+    Verschiebt das oberste Element von B nach A und gibt pa aus.
+
+  pb()   [extern]
+    Verschiebt das oberste Element von A nach B und gibt pb aus.
+
+
+DATEI: swap.c
+-------------
+  swap()   [intern/static]
+    Interner Zeigerumbau: vertauscht die beiden obersten Knoten eines Stacks, falls
+    mindestens zwei existieren.
+
+  sa()   [extern]
+    Vertauscht die beiden obersten Elemente von A und gibt sa aus.
+
+  sb()   [extern]
+    Vertauscht die beiden obersten Elemente von B und gibt sb aus.
+
+  ss()   [extern]
+    Vertauscht die obersten beiden Elemente in A und B und gibt ss aus; bleibt als eine der
+    elf erlaubten Stackoperationen erhalten.
+
+
+DATEI: rotate.c
+---------------
+  rotate()   [intern/static]
+    Interne Vorwärtsrotation eines Stacks: der erste Knoten wird ans Ende verschoben.
+
+  ra()   [extern]
+    Rotiert A nach vorn und gibt ra aus.
+
+  rb()   [extern]
+    Rotiert B nach vorn und gibt rb aus.
+
+  rr()   [extern]
+    Rotiert A und B jeweils nach vorn und gibt den gemeinsamen Befehl rr aus.
+
+
+DATEI: rev_rotate.c
+-------------------
+  rev_rotate()   [intern/static]
+    Interne Rückwärtsrotation eines Stacks: der letzte Knoten wird an die Spitze verschoben.
+
+  rra()   [extern]
+    Rotiert A nach hinten und gibt rra aus.
+
+  rrb()   [extern]
+    Rotiert B nach hinten und gibt rrb aus.
+
+  rrr()   [extern]
+    Rotiert A und B jeweils nach hinten und gibt den gemeinsamen Befehl rrr aus.
+
+
+======================================================================
+RANKING UND ALLGEMEINE HILFSFUNKTIONEN
+======================================================================
+
+DATEI: rating_buster.c
+----------------------
+  calc_size()   [extern]
+    Zählt die Listenknoten eines Stacks.
+
+  get_ranked()   [extern]
+    Vergibt jedem Element den Rang entsprechend der Anzahl kleinerer Zahlen. Erzeugt die
+    Ränge 0 bis n-1 unabhängig vom Zahlenbereich.
+
+  calc_disorder()   [extern]
+    Zählt alle Ranginversionen und teilt sie durch die maximale Anzahl möglicher Paare.
+    Ergebnis: 0,0 bei sortierter, 1,0 bei umgekehrt sortierter Folge.
+
+
+DATEI: sort_utils.c
+-------------------
+  abs_steps()   [extern]
+    Liefert die positive Anzahl der Rotationsschritte, unabhängig vom Vorzeichen.
+
+  calc_rota_pos()   [extern]
+    Wandelt eine Position in eine möglichst kurze Rotationsanzahl um; positive Werte
+    bedeuten vorwärts, negative rückwärts.
+
+  same_word()   [extern]
+    Vergleicht zwei nullterminierte Zeichenketten ohne strcmp; ein NULL-Argument wird als
+    kein Treffer behandelt.
+
+  is_sorted()   [extern]
+    Prüft, ob die Originalzahlen in A bereits aufsteigend stehen.
+
+  calc_rank_pos()   [extern]
+    Sucht die Position eines vorgegebenen Rangs in einem Stack, ohne Knoten zu verschieben.
+
+
+======================================================================
+SCHNELLE SONDERFAELLE UND KLEINE TEILBEREICHE
+======================================================================
+
+DATEI: sort_small.c
+-------------------
+  sort_small()   [intern/static]
+    Sortiert höchstens fünf Zahlen: gegebenenfalls kleinste Ränge nach B schieben, die
+    übrigen drei sortieren und B wieder nach A zurückholen. Gibt 0 zurück, wenn der Stack
+    größer ist.
+
+  cyclic_sorted()   [intern/static]
+    Prüft die zyklische Rangfolge einschließlich des Übergangs zwischen letztem und erstem
+    Element. Ein einziger Abstieg bedeutet, dass eine Rotation genügt.
+
+  first_bad_position()   [intern/static]
+    Findet die erste Position mit unerwartetem Rang; liefert sie nur dann zurück, wenn
+    insgesamt genau zwei Positionen falsch sind.
+
+  check_one_swap()   [intern/static]
+    Erkennt zwei benachbarte vertauschte Ränge und korrigiert sie durch Hinrotieren, sa und
+    Zurückrotieren.
+
+  quick_check()   [extern]
+    Erledigt bereits sortierte, zyklisch sortierte, durch einen Tausch korrigierbare und
+    sehr kleine Stacks vor den Hauptalgorithmen. Rückgabe 1 bedeutet fertig.
+
+
+DATEI: sort_three.c
+-------------------
+  sort_three_a()   [extern]
+    Sortiert einen vollständigen dreielementigen Stack A aufsteigend mit möglichst wenigen
+    swaps/Rotationen.
+
+  sort_three_b()   [extern]
+    Sortiert einen vollständigen dreielementigen Stack B absteigend, damit die spätere
+    Rückübertragung nach A passt.
+
+  sort_three_top_a()   [extern]
+    Sortiert nur die obersten drei Knoten von A aufsteigend; benutzt vorübergehend B, ohne
+    die tieferen A-Knoten zu rotieren.
+
+  sort_three_top_b()   [extern]
+    Sortiert nur die obersten drei Knoten von B absteigend; benutzt vorübergehend A, ohne
+    tiefere B-Knoten zu rotieren.
+
+
+DATEI: sort_four.c
+------------------
+  four_index()   [intern/static]
+    Berechnet aus der Permutation von vier aufeinanderfolgenden Rängen einen eindeutigen
+    Tabellenindex von 0 bis 23.
+
+  do_four_moves()   [intern/static]
+    Führt eine als Zeichenfolge kodierte Befehlsfolge aus (a=sa, b=sb, p=pa, q=pb).
+
+  sort_four_a()   [extern]
+    Sortiert die obersten vier Ränge in A mit einer festen Tabelle für alle 24
+    Permutationen; tiefere Stackteile bleiben von Rotationen verschont.
+
+  sort_four_b()   [extern]
+    Sortiert die obersten vier Ränge in B und überträgt sie über die passende Befehlsfolge
+    korrekt nach A.
+
+
+======================================================================
+SIMPLE: LIS UND GREEDY
+======================================================================
+
+DATEI: simple_algo.c
+--------------------
+  selection_sort()   [intern/static]
+    Speicherfreier Simple-Fallback: sucht nacheinander die Ränge 0,1,... in A, bringt sie
+    nach oben, schiebt sie nach B und anschließend alle wieder nach A.
+
+  simple_ranked()   [extern]
+    Startet LIS + günstige Greedy-Einfügungen ohne Operationslimit. Nur wenn der LIS-
+    Arbeitsspeicher nicht reserviert werden kann, wird Selection-Sort genutzt.
+
+
+DATEI: find_lis.c
+-----------------
+  initialize_lis()   [intern/static]
+    Initialisiert für jeden Rang die LIS-Hilfsfelder length, parent und keep.
+
+  update_lis()   [intern/static]
+    Sucht unter den vorherigen Knoten kleinere Ränge und speichert den besten Vorgänger für
+    die längste zunehmende Teilfolge, die am aktuellen Knoten endet.
+
+  mark_lis()   [extern]
+    Berechnet die längste aufsteigende Teilfolge (LIS) und markiert über ihre Vorgängerkette
+    die Ränge, die in A bleiben sollen.
+
+
+DATEI: greedy_sort.c
+--------------------
+  push_unmarked()   [intern/static]
+    Durchläuft die ursprünglichen A-Elemente einmal: markierte Ränge bleiben per ra in A,
+    die übrigen werden mit pb nach B geschoben. Gibt die Anzahl der Roh-Operationen zurück.
+
+  insert_cheapest()   [intern/static]
+    Wählt wiederholt die billigste Einfügung aus B, führt nötige Rotationen und pa aus und
+    prüft vor jedem Schritt ein optionales Operationsbudget.
+
+  finish_greedy()   [intern/static]
+    Bringt nach den Einfügungen den Rang 0 mit der kürzesten Rotation an die Spitze von A;
+    berücksichtigt ein optionales Restbudget.
+
+  sort_greedy()   [extern]
+    Gemeinsame Engine für Simple und Medium: markiert LIS oder natürlichen Lauf, schiebt
+    unmarkierte Werte nach B, fügt sie günstig ein und rotiert A fertig. Rückgabe 0 bei
+    malloc-Fehler oder Budgetabbruch.
+
+
+DATEI: get_move.c
+-----------------
+  insertion_before()   [intern/static]
+    Prüft, ob ein Rang zwischen zwei Nachbarn in A gehört, einschließlich des zyklischen
+    Übergangs Maximum zu Minimum.
+
+  target_rota()   [intern/static]
+    Findet in zyklisch sortiertem A den Einfügeplatz eines Rangs und gibt die kürzeste
+    A-Rotation bis zu diesem Platz zurück.
+
+  check_move()   [intern/static]
+    Berechnet die Kosten einer Rotationskombination und übernimmt sie als neue beste
+    Bewegung, wenn sie billiger ist (oder bei Gleichstand weniger Einzelschritte benötigt).
+
+  check_directions()   [intern/static]
+    Prüft für A und B jeweils Vorwärts- und Rückwärtsrotation; dadurch werden vier
+    Kombinationen verglichen.
+
+  cheapest_move()   [extern]
+    Untersucht alle Kandidaten in B und liefert die insgesamt günstigste Kombination von A-
+    und B-Rotationen. Die Stacks werden noch nicht verändert.
+
+
+DATEI: call_rotations.c
+-----------------------
+  rotate_a()   [extern]
+    Führt eine vorgegebene Anzahl ra oder rra aus; das Vorzeichen entscheidet über die
+    Richtung.
+
+  rotate_b()   [extern]
+    Führt eine vorgegebene Anzahl rb oder rrb aus; das Vorzeichen entscheidet über die
+    Richtung.
+
+  move_cost()   [extern]
+    Berechnet die Rotationskosten. Gleichgerichtete Bewegungen können mit rr bzw. rrr
+    gemeinsam ausgeführt werden; sonst werden die Kosten addiert.
+
+  do_move()   [extern]
+    Führt zunächst kombinierbare rr/rrr-Operationen und anschließend übrige Einzelrotationen
+    aus; die spätere pa-Einfügung erfolgt beim Aufrufer.
+
+
+======================================================================
+MEDIUM: NATURAL RUN UND CHUNKS
+======================================================================
+
+DATEI: medium_algo.c
+--------------------
+  extend_run()   [intern/static]
+    Verlängert einen streng aufsteigenden benachbarten Abschnitt um ein Element oder beginnt
+    bei einem Rangabstieg einen neuen Abschnitt.
+
+  best_run()   [intern/static]
+    Sucht den längsten unmittelbar zusammenhängenden aufsteigenden Abschnitt in A und
+    liefert dessen Startknoten sowie Länge.
+
+  mark_run()   [extern]
+    Markiert sämtliche Ränge des längsten natürlichen Laufs. Anders als bei LIS dürfen keine
+    Elemente übersprungen werden.
+
+  medium_ranked()   [extern]
+    Versucht Natural-Run-Greedy mit einem Roh-Operationsbudget von 12*n. Bei Budgetabbruch
+    oder malloc-Fehler holt es B zurück und startet den Chunk-Fallback.
+
+
+DATEI: medium_chunks.c
+----------------------
+  get_chunk_size()   [intern/static]
+    Berechnet die aufgerundete Quadratwurzel von n als Chunkgröße, ohne sqrt() zu verwenden.
+
+  fill_chunks()   [intern/static]
+    Schiebt schrittweise aufsteigende Rangfenster nach B: Werte im aktuellen Fenster gehen
+    per pb nach B, andere werden in A weiterrotiert.
+
+  sort_chunks()   [extern]
+    Fallback für Medium: füllt B mit sqrt(n)-Rangfenstern und holt anschließend den jeweils
+    größten verbleibenden Rang nach A zurück.
+
+
+======================================================================
+COMPLEX: REKURSIVE PARTITIONIERUNG
+======================================================================
+
+DATEI: complex_algo.c
+---------------------
+  quick_a_small()   [intern/static]
+    Sortiert rekursive A-Teilgruppen der Größe 2 bis 4 direkt; bei Teilbereichen dürfen
+    untere Stackelemente nicht durch Rotationen gestört werden.
+
+  partition_a()   [intern/static]
+    Verteilt die obersten n Knoten aus A anhand eines Rang-Pivots: kleinere nach B, größere
+    per ra in A. Bei darunterliegenden Knoten werden Rotationen wieder zurückgenommen.
+
+  split_a()   [extern]
+    Rekursiver Complex-A-Zweig: halbiert den Rangbereich, sortiert die obere Hälfte in A und
+    überträgt danach die kleinere Hälfte aus B zurück.
+
+  complex_ranked()   [extern]
+    Aktiviert den Ausgabeoptimierer, startet die rekursive A/B-Partitionierung für alle
+    Ränge und gibt am Ende gepufferte Operationen aus.
+
+
+DATEI: split_b.c
+----------------
+  quick_b_small()   [intern/static]
+    Sortiert rekursive B-Teilgruppen bis vier Elemente und überträgt diese korrekt nach A.
+
+  partition_b()   [intern/static]
+    Teilt die obersten n Knoten von B: höhere Ränge gehen per pa nach A, niedrigere rotieren
+    in B; fremde untere B-Teilbereiche werden wieder ausgerichtet.
+
+  split_b()   [extern]
+    Rekursiver Complex-B-Zweig: zerlegt einen Rangbereich in hohe/niedrige Teilgruppen,
+    verarbeitet sie in passender Reihenfolge und baut A auf.
+
+
+======================================================================
+BENCHMARK
+======================================================================
+
+DATEI: bench_state.c
+--------------------
+  ps_bench_data()   [extern]
+    Liefert einen Zeiger auf den einzigen funktionslokalen statischen Bench-/Optimizer-
+    Zustand. Der Zustand ist keine globale Variable.
+
+  ps_bench_begin()   [extern]
+    Setzt Bench-Zähler und Optimizer-Puffer am Anfang eines Laufs zurück und aktiviert oder
+    deaktiviert die Statistik.
+
+  ps_bench_set()   [extern]
+    Speichert den ursprünglichen Disorder-Wert, die tatsächlich gewählte Strategie und die
+    Information, ob Adaptive aktiv war.
+
+  ps_op_kind()   [extern]
+    Ordnet einer genau passenden Push_swap-Befehlszeichenkette einen der elf internen
+    Operationsindizes zu; andere Texte ergeben -1.
+
+  ps_bench_record()   [extern]
+    Zählt eine tatsächlich direkt ausgegebene Push_swap-Operation, sofern --bench aktiv ist.
+    Noch gepufferte Befehle werden hier nicht gezählt.
+
+
+DATEI: bench_format.c
+---------------------
+  ps_err_text()   [extern]
+    Schreibt Text ausschließlich nach stderr, damit stdout für Checker-Befehle frei bleibt.
+
+  ps_err_number()   [extern]
+    Schreibt eine nichtnegative long-Zahl dezimal nach stderr ohne printf.
+
+  ps_err_count()   [extern]
+    Schreibt einen Operationsnamen mit Zähler nach stderr und fügt je nach letzter Position
+    Leerzeichen oder Zeilenumbruch an.
+
+
+DATEI: bench_output.c
+---------------------
+  print_disorder()   [intern/static]
+    Formatiert den anfänglichen Disorder-Wert als Prozentzahl mit zwei Nachkommastellen.
+
+  print_strategy()   [intern/static]
+    Schreibt den gewählten Modus und dessen angegebene Komplexitätsklasse; bei Adaptive wird
+    der Adaptive-Name vorangestellt.
+
+  print_counts_one()   [intern/static]
+    Schreibt die erste Zählerzeile für sa, sb, ss, pa und pb.
+
+  print_counts_two()   [intern/static]
+    Schreibt die zweite Zählerzeile für ra, rb, rr, rra, rrb und rrr.
+
+  ps_bench_print()   [extern]
+    Gibt nach der Sortierung fünf Benchmark-Zeilen ausschließlich auf stderr aus, wenn
+    --bench eingeschaltet ist.
+
+
+======================================================================
+COMPLEX-AUSGABEOPTIMIERER
+======================================================================
+
+DATEI: ps_opt_control.c
+-----------------------
+  ps_opt_begin()   [extern]
+    Schaltet vor Complex die Befehlsoptimierung ein und leert ihren Puffer; der
+    Stackparameter wird derzeit nicht verwendet.
+
+  ps_opt_finish()   [extern]
+    Leert nach Complex alle noch gepufferten Befehle und schaltet die Optimierung aus; der
+    Stackparameter wird derzeit nicht verwendet.
+
+  can_buffer()   [intern/static]
+    Prüft, ob der Befehl eine einzelne, zwischen A und B unabhängig verschiebbare Swap- oder
+    Rotationsoperation ist.
+
+  ps_opt_capture()   [extern]
+    Fängt im aktiven Complex-Modus geeignete Einzeloperationen im Puffer ab. Vor Pushes,
+    Doppeloperationen oder bei vollem Puffer werden die bisherigen Befehle ausgegeben.
+
+
+DATEI: ps_opt_buffer.c
+----------------------
+  is_inverse()   [intern/static]
+    Erkennt sich aufhebende Paare desselben Stacks, etwa ra/rra oder zweimal sa.
+
+  add_single()   [intern/static]
+    Kürzt aufeinanderfolgende inverse Einzeloperationen in der A- bzw. B-Liste; ansonsten
+    hängt es die Operation an.
+
+  ps_opt_flush()   [extern]
+    Trennt die gepufferten Befehle in A- und B-Listen, entfernt inverse Nachbarn und
+    veranlasst das optimierte Zusammenführen. Setzt danach die Pufferlänge auf null.
+
+
+DATEI: ps_opt_join.c
+--------------------
+  paired_op()   [intern/static]
+    Ermittelt, ob ein A-/B-Befehlspaar zu ss, rr oder rrr kombiniert werden kann, und
+    liefert sonst -1.
+
+  fill_table()   [intern/static]
+    Füllt eine dynamische DP-Tabelle, um möglichst viele passende A-/B-Operationen zu
+    gemeinsamen Befehlen kombinieren zu können.
+
+  write_joined()   [intern/static]
+    Rekonstruiert einen kürzeren Ausgabestrom anhand der DP-Tabelle, ohne die Reihenfolge
+    der Operationen innerhalb eines einzelnen Stacks zu ändern.
+
+  ps_opt_join()   [extern]
+    Versucht eine DP-gestützte Zusammenführung von A- und B-Einzeloperationen. Wenn malloc
+    fehlschlägt, werden beide Listen unverändert nacheinander ausgegeben.
+
+
+DATEI: ps_opt_output.c
+----------------------
+  ps_opt_write()   [extern]
+    Schreibt eine optimierte Operation direkt nach stdout und aktualisiert ihre Bench-
+    Zähler. Umgeht ft_putstr, um keine erneute Pufferung auszulösen.
+
+ENDE DER FUNKTIONSUEBERSICHT

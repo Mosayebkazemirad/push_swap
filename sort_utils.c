@@ -5,57 +5,68 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: gkudelka <gkudelka@learner.42.tech>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/11/06 10:32:34 by gkudelka          #+#    #+#             */
-/*   Updated: 2026/11/07 14:36:51 by gkudelka         ###   ########.fr       */
+/*   Created: 2026/11/12 14:26:12 by gkudelka          #+#    #+#             */
+/*   Updated: 2026/11/14 13:09:44 by gkudelka         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-unsigned int	calc_size(t_stack *stack)
+/* Betrag einer Schrittzahl, ohne die Richtung zu beachten. */
+int	abs_steps(int value)
 {
-	unsigned int	count;
-
-	count = 0;
-	while (stack != NULL)
-	{
-		count++;
-		stack = stack->next;
-	}
-	return (count);
+	if (value < 0)
+		return (-value);
+	return (value);
 }
 
-int	calc_rota(t_stack *stack, int rank)
+/* Wandelt einen Index in die kuerzere Drehrichtung um.
+** Negativ bedeutet rueckwaerts rotieren. */
+// میخوام بفهمم صفر در نیمه بالاییه یا نمیه پایینی اگر پایینی بود عدد منفی میفرستیم اگ بالایی مثبت
+int	calc_rota_pos(int index, int size)
 {
-	int	index;
-	int	size;
-
-	size = (int)calc_size(stack);
-	index = 0;
-	while (stack && stack->rank != rank)
-	{
-		index++;
-		stack = stack->next;
-	}
-	if (!stack)
-		return (INT_MAX);
 	if (index > size / 2)
 		return (index - size);
 	return (index);
 }
 
-int	get_chunk_size(int n)
+/* Vergleicht Flag-Texte ohne libft/strcmp.
+** NULL wird als kein Treffer behandelt. */
+int	same_word(const char *a, const char *b)
 {
-	int	size;
-
-	size = 1;
-	while ((long)size * size < n)
-		size++;
-	return (size);
+	if (!a || !b)
+		return (0);
+	while (*a && *a == *b)
+	{
+		a++;
+		b++;
+	}
+	return (*a == *b);
 }
 
-void	restore_binary(t_stack **a, t_stack **b)
+/* Prueft, ob die urspruenglichen Zahlen in A sortiert sind. */
+int	is_sorted(t_stack *a)
 {
-	while (*b)
-		pa(a, b);
+	while (a && a->next)
+	{
+		if (a->n > a->next->n)
+			return (0);
+		a = a->next;
+	}
+	return (1);
+}
+
+/* Position eines Rangs, ohne den Stack zu veraendern. */
+/* Sucht die Position eines Rangs ohne Stack-Aenderung. */
+int	calc_rank_pos(t_stack *stack, int rank)
+{
+	int	pos;
+
+	pos = 0;
+	while (stack && stack->rank != rank)
+	{
+		pos++;
+		stack = stack->next;
+	}
+	return (pos);
 }

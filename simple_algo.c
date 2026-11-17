@@ -1,48 +1,47 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                       :::      ::::::::    */
-/*   simple_algo.c                                     :+:      :+:    :+:    */
-/*                                                   +:+ +:+         +:+      */
-/*   By: mkazemir <mkazemir@learner.42.tech>       #+#  +:+       +#+         */
-/*                                               +#+#+#+#+#+   +#+            */
-/*   Created: 2026/11/13 11:32:39 by mkazemir         #+#    #+#              */
-/*   Updated: 2026/11/13 11:35:05 by mkazemir        ###   ########.fr        */
+/*                                                        :::      ::::::::   */
+/*   simple_algo.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gkudelka <gkudelka@learner.42.tech>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/11/12 12:12:34 by gkudelka          #+#    #+#             */
+/*   Updated: 2026/11/14 13:09:41 by gkudelka         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-static void	sort_three_cases(t_stack **a, int f, int s, int t)
+/* Fallback ohne malloc: kleinsten noch fehlenden Rang suchen,
+** nach B schieben und anschliessend alles zurueckholen.
+** Benoetigt einen leeren Stack B beim Start. */
+static void	selection_sort(t_stack **a, t_stack **b)
 {
-	if (f > s && s < t && f < t) // 2 1 3 with sa = 123 321
-		sa(a);
-	else if (f > s && s > t) //3 2 1  with sa = 231 rra = 123
+	int	size;
+	int	rank;
+	int	pos;
+
+	size = calc_size(*a);
+	rank = 0;
+	while (rank < size)
 	{
-		sa(a);
-		rra(a);
+		pos = calc_rank_pos(*a, rank);
+		rotate_a(a, calc_rota_pos(pos, calc_size(*a)));
+		pb(a, b);
+		rank++;
 	}
-	else if (f > s && s < t && f > t) // 3 1 2  ra = 123
-		ra(a);
-	else if (f < s && s > t && f < t)// 1 3 2 sa = 3 1 2 ra = 123
-	{
-		sa(a);
-		ra(a);
-	}
-	else if (f < s && s > t && f > t) // 2 3 1 rra = 123
-		rra(a);
+	while (*b)
+		pa(a, b);
 }
 
-void	simple_algo(t_stack **a, t_stack **b)
-{
-	int	f;
-	int	s;
-	int	t;
+/* Simple behaelt die LIS in A und fuegt den Rest guenstig ein.
+** Ohne Operationslimit; nur bei malloc-Fehler wird die alte
+** Selection-Sort-Variante als speicherfreier Fallback genutzt. */
+/*
 
-	(void) b;
-	if (calc_size(*a) == 2)
-		return (sa(a));
-	f = (*a)->rank;
-	s = (*a)->next->rank;
-	t = (*a)->next->next->rank;
-	sort_three_cases(a, f, s, t);
+*/
+void	simple_ranked(t_stack **a, t_stack **b)
+{
+	if (!sort_greedy(a, b, 0, 0))
+		selection_sort(a, b);
 }

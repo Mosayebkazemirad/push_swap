@@ -1,119 +1,75 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                       :::      ::::::::    */
+/*                                                        :::      ::::::::   */
 /*   check_input.c                                      :+:      :+:    :+:   */
-/*                                                   +:+ +:+         +:+      */
-/*   By: mkazemir <mkazemir@learner.42.tech>       #+#  +:+       +#+         */
-/*                                               +#+#+#+#+#+   +#+            */
-/*   Created: 2026/11/04 09:40:44 by mkazemir         #+#    #+#              */
-/*   Updated: 2026/11/05 11:54:08 by mkazemir         ###   ########.fr       */
+/*                                                    +:+ +:+         +:+     */
+/*   By: gkudelka <gkudelka@learner.42.tech>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/11/04 09:40:44 by mkazemir          #+#    #+#             */
+/*   Updated: 2026/11/14 13:09:22 by gkudelka         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-/* Gibt den zugewiesenen Speicher für den gesamten Stack frei. */
+/* Gibt auch bei einem Parserfehler alle bisherigen Knoten frei. */
 void	free_stack(t_stack **stack)
 {
-	t_stack	*tmp;
-	t_stack	*current;
+	t_stack	*next;
 
-	if (!stack || !*stack)
+	if (!stack)
 		return ;
-	current = *stack;
-	while (current)
+	while (*stack)
 	{
-		tmp = current->next;
-		free(current);
-		current = tmp;
+		next = (*stack)->next;
+		free(*stack);
+		*stack = next;
 	}
-	*stack = NULL;
 }
 
-/* Erstellt einen neuen Knoten und fügt ihn am Ende des Stacks hinzu. */
-static void	add_node_to_stack(t_stack **stack, int num)
+/* Ein Argument darf mehrere durch Leerraum getrennte Zahlen haben. */
+static void	parse_argument(t_stack **stack, const char *str)
 {
-	t_stack	*new_node;
-	t_stack	*last;
+	int	number;
+	int	found;
 
-	new_node = malloc(sizeof(t_stack));
-	if (!new_node)
-		return ;
-	new_node->n = num;
-	new_node->next = NULL;
-	if (*stack == NULL)
+	found = 0;
+	while (*str)
 	{
-		*stack = new_node;
+		/*parse_numbers  کنترل فاصله و اسپیس میفرستیم برای این فایل*/
+
+		while (ps_is_space(*str))
+			str++;
+		if (!*str)
+			break ;
+
+		if (!ps_read_number(&str, &number))
+			ps_input_error(stack);
+		// میفرسیتیم برای اضافه کردن در فایل parse_stack
+		ps_append_number(stack, number);
+		found = 1;
 	}
-	else
-	{
-		last = *stack;
-		while (last->next)
-			last = last->next;
-		last->next = new_node;
-	}
+	/*
+	فرض کن فقط اسپیس باشه بعدش برنامه از بالا بریک میشه 
+	اگر found وجود نداشت،
+	 برنامه این ورودیِ خالی را به عنوان یک آرگومانِ سالم و بدون خطا قبول می‌کرد 
+	 (در حالی که طبق قوانین push_swap آرگومان خالی یا پر از فاصله باید Error بدهد).
+
+	*/
+	if (!found)
+		ps_input_error(stack);
 }
 
-/* Überprüft, ob der übergebene String eine gültige Zahl enthält. */
-static int	is_valid_number(char *str)
-{
-	int	i;
-
-	i = 0;
-	if (str[i] == '-' || str[i] == '+')
-		i++;
-	if (str[i] == '\0')
-		return (1);
-	while (str[i])
-	{
-		if (str[i] < '0' || str[i] > '9')
-			return (1);
-		i++;
-	}
-	return (0);
-}
-
-/* Überprüft, ob eine bestimmte Zahl bereits im Stack vorhanden ist. */
-static int	is_duplicate(t_stack *stack, int num)
-{
-	t_stack	*current;
-
-	current = stack;
-	while (current != NULL)
-	{
-		if (current->n == num)
-			return (1);
-		current = current->next;
-	}
-	return (0);
-}
-
-/* Überprüft die Eingabeargumente, erstellt den Stack A und behandelt Fehler. */
+/* Baut A aus allen verbliebenen argv-Argumenten auf.
+** Die eigentliche Zahlenpruefung uebernehmen die Parser-Helfer. */
 t_stack	*input_check(int argc, char **argv)
 {
-	t_stack		*stack_a;
-	int			i;
-	long int	num;
+	t_stack	*stack;
+	int		i;
 
-	stack_a = NULL;
+	stack = NULL;
 	i = 1;
 	while (i < argc)
-	{
-		if (is_valid_number(argv[i]))
-		{
-			ft_putstr("Error\n");
-			free_stack(&stack_a);
-			exit(1);
-		}
-		num = ft_atoi(argv[i]);
-		if (num > INT_MAX || num < INT_MIN || is_duplicate(stack_a, (int) num))
-		{
-			ft_putstr("Error\n");
-			free_stack(&stack_a);
-			exit(1);
-		}
-		add_node_to_stack(&stack_a, (int) num);
-		i++;
-	}
-	return (stack_a);
+		parse_argument(&stack, argv[i++]);
+	return (stack);
 }

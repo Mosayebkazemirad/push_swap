@@ -5,70 +5,84 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: gkudelka <gkudelka@learner.42.tech>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/11/06 14:44:03 by gkudelka          #+#    #+#             */
-/*   Updated: 2026/11/06 14:44:36 by gkudelka         ###   ########.fr       */
+/*   Created: 2026/11/13 12:12:42 by gkudelka          #+#    #+#             */
+/*   Updated: 2026/11/14 13:09:27 by gkudelka         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-void	restore_a(t_stack **a, t_stack **b, int size)
+/* Ein aufsteigender Lauf endet, sobald der naechste Rang
+** nicht groesser als der aktuelle Rang ist. */
+static int	extend_run(t_stack *node, t_stack **start, int length)
 {
-	int	rota;
-
-	while (*b)
+	if (node->rank >= node->next->rank)
 	{
-		rota = calc_rota(*b, size - 1);
-		while (rota > 0)
+		*start = node->next;
+		return (1);
+	}
+	return (length + 1);
+}
+
+/* Findet den laengsten direkt zusammenhaengenden
+** aufsteigenden Abschnitt (anders als eine LIS). */
+static t_stack	*best_run(t_stack *a, int *best_length)
+{
+	t_stack	*node;
+	t_stack	*start;
+	t_stack	*best;
+	int		length;
+
+	best = a;
+	start = a;
+	length = 1;
+	*best_length = 1;
+	node = a;
+	while (node->next)
+	{
+		length = extend_run(node, &start, length);
+		if (length > *best_length)
 		{
-			rb(b);
-			rota--;
+			best = start;
+			*best_length = length;
 		}
-		while (rota < 0)
-		{
-			rrb(b);
-			rota++;
-		}
-		pa(a, b);
-		size--;
+		node = node->next;
+	}
+	return (best);
+}
+
+/* Markiert alle Knoten des gefundenen Abschnitts.
+** Im Unterschied zur LIS muessen sie nebeneinander stehen. */
+void	mark_run(t_stack *a, t_sort_mark *work, int size)
+{
+	t_stack	*best;
+	int		length;
+	int		i;
+
+	i = 0;
+	while (i < size)
+		work[i++].keep = 0;
+	best = best_run(a, &length);
+	while (length-- > 0)
+	{
+		work[best->rank].keep = 1;
+		best = best->next;
 	}
 }
 
-static void	push_chunk(t_stack **a, t_stack **b, int min_rank,
-		int chunk_size)
+/* Natural-Run-Greedy darf hoechstens 12*n Roh-OPs verbrauchen.
+** Falls das Budget nicht reicht oder malloc scheitert, wird B zuerst
+** geleert und dann erneut mit sqrt(n)-Chunks sortiert.
+** Wichtig: Der Chunk-Fallback startet mit allen Werten in A. */
+void	medium_ranked(t_stack **a, t_stack **b)
 {
-	int	count;
-
-	count = 0;
-	while (*a && count < chunk_size)
-	{
-		if ((*a)->rank >= min_rank
-			&& (*a)->rank < min_rank + chunk_size)
-		{
-			pb(a, b);
-			count++;
-		}
-		else
-			ra(a);
-	}
-}
-
-void	medium_algo(t_stack **a, t_stack **b)
-{
-	int	chunk_size;
 	int	size;
-	int	min_rank;
 
-	if (!a || !b || !*a || is_sorted(*a))
-		return ;
-	get_ranked(*a);
-	size = (int)calc_size(*a);
-	chunk_size = get_chunk_size(size);
-	min_rank = 0;
-	while (min_rank < size)
+	size = calc_size(*a);
+	if (!sort_greedy(a, b, 12L * size, 1))
 	{
-		push_chunk(a, b, min_rank, chunk_size);
-		min_rank += chunk_size;
+		while (*b)
+			pa(a, b);
+		sort_chunks(a, b, size);
 	}
-	restore_a(a, b, size);
 }

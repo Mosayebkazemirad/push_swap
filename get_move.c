@@ -14,6 +14,12 @@
 
 /* Ist rank zwischen previous und current einzufuegen?
 ** Behandelt auch den Kreisuebergang Maximum -> Minimum. */
+/*
+(این تابع هم حالت عادی مثل 2 < 3 < 5 را چک
+ می‌کند و هم نقطه شکستِ حلقه را، مثلاً وقتی عدد جدید کوچک‌ترین یا بزرگ‌ترین
+ عدد کل پشته باشد و بین بزرگ‌ترین عددِ فعلی و کوچک‌ترین عددِ فعلی بنشیند).
+ تشخیص می‌دهد که آیا عدد جدید از نظر مقدار، دقیقاً بین دو عددِ پشت‌سرهم در پشته a جا می‌گیرد یا نه
+*/
 static int	insertion_before(int previous, int current, int rank)
 {
 	if (previous < current)
@@ -23,7 +29,10 @@ static int	insertion_before(int previous, int current, int rank)
 
 /* Sucht den Einfuegeplatz fuer rank in zyklisch sortiertem A.
 ** Ergebnis: kuerzeste Rotation (+ra oder -rra).
-** A wird hier noch nicht veraendert. */
+** A wird hier noch nicht veraendert.
+ا کمک تابع قبلی، جایگاه مناسبِ عدد را در پشته a پیدا می‌کند و می‌گوید
+ پشته a چقدر باید بچرخد تا آن جایگاه به بالا بیاید
+*/
 static int	target_rota(t_stack *a, int rank)
 {
 	t_stack	*last;
@@ -50,13 +59,18 @@ static int	target_rota(t_stack *a, int rank)
 
 /* Berechnet die Kosten einer Rotationskombination.
 ** Bei weniger Operationen wird die bisher beste ersetzt.
-** Bei Gleichstand gewinnt die kuerzere Gesamtstrecke. */
+** Bei Gleichstand gewinnt die kuerzere Gesamtstrecke. 
+: هزینه‌ی واقعی هر کدام از آن ۴ حالت را حساب می‌کند و اگر از بهترین
+ رکوردِ قبلی ارزان‌تر بود، آن را به عنوان حرکت برتر ذخیره می‌کند.
+ 
+*/
 static void	check_move(t_sort_move *best, int a_steps, int b_steps)
 {
 	t_sort_move	move;
 
 	move.ra = a_steps;
 	move.rb = b_steps;
+				//call_rotations
 	move.cost = move_cost(a_steps, b_steps);
 	if (move.cost < best->cost
 		|| (move.cost == best->cost
@@ -67,7 +81,10 @@ static void	check_move(t_sort_move *best, int a_steps, int b_steps)
 
 /* Probiert fuer A und B beide Drehrichtungen aus.
 ** Damit koennen rr und rrr auch laengere Einzelwege
-** zu einer guenstigeren Gesamtkombination machen. */
+** zu einer guenstigeren Gesamtkombination machen. 
+هر ۴ حالتِ ممکنِ چرخشِ هم‌زمان برای a و b (هر دو بالا، هر دو پایین، یا برعکس هم) را امتحان می‌کند تا ببیند کجا
+ می‌توان از چرخش‌های هم‌زمان (rr / rrr) سود برد
+*/
 static void	check_directions(t_sort_move *best, int *positions, int *sizes)
 {
 	check_move(best, positions[0], positions[1]);
@@ -91,10 +108,11 @@ t_sort_move	cheapest_move(t_stack *a, t_stack *b)
 	positions[1] = 0;
 	while (b)
 	{
+						//static
 		positions[0] = target_rota(a, b->rank);
 		if (positions[0] < 0)
 			positions[0] += sizes[0];
-		check_directions(&best, positions, sizes);
+		check_directions(&best, positions, size);
 		b = b->next;
 		positions[1]++;
 	}

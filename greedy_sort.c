@@ -16,6 +16,9 @@
 ** keep = 1: ra erhaelt die Reihenfolge in A.
 ** keep = 0: pb verschiebt das Element nach B.
 ** Ein Durchlauf = genau eine ausgegebene Operation. */
+/*
+اینجا ما کسایی که در دفترجه ورک ردیف نشدن یعنی کیپشون صفره رو  از آ خارج می کنیم
+*/
 static int	push_unmarked(t_stack **a, t_stack **b, t_sort_mark *work)
 {
 	int	n;
@@ -23,7 +26,7 @@ static int	push_unmarked(t_stack **a, t_stack **b, t_sort_mark *work)
 
 	n = calc_size(*a);
 	i = 0;
-	while (i++ < n)
+	while (i++ < n)//4 1 3 2 
 	{
 		if (work[(*a)->rank].keep)
 			ra(a);
@@ -36,12 +39,16 @@ static int	push_unmarked(t_stack **a, t_stack **b, t_sort_mark *work)
 /* Waehlt wiederholt den guenstigsten Kandidaten aus B.
 ** move.cost zaehlt nur Rotationen; pa kostet +1.
 ** Bei einem gesetzten Limit kann die Funktion abbrechen. */
+/*
+انتقال هوشمندانه از ب به آ
+*/
 static int	insert_cheapest(t_stack **a, t_stack **b, long *count, long limit)
 {
 	t_sort_move	move;
 
 	while (*b)
 	{
+		//get_move
 		move = cheapest_move(*a, *b);
 		if (limit > 0 && *count + move.cost + 1 > limit)
 			return (0);
@@ -99,10 +106,12 @@ int	sort_greedy(t_stack **a, t_stack **b, long limit, int run)
 	else
 	//find_lis
 		mark_lis(*a, work, size);
+		//static اینجا پوش میکنیم کسایی که مارک ندارن 
 	used = push_unmarked(a, b, work);
 	free(work);
 	result = (limit == 0 || used <= limit);
 	if (result)
+				//استیت
 		result = insert_cheapest(a, b, &used, limit);
 	if (result)
 		result = finish_greedy(a, &used, limit);

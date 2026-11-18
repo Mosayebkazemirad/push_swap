@@ -51,7 +51,7 @@ int	move_cost(int a_steps, int b_steps)
 {
 	int	a_cost;
 	int	b_cost;
-
+			//sort_utils
 	a_cost = abs_steps(a_steps);
 	b_cost = abs_steps(b_steps);
 	if (a_steps > 0 && b_steps > 0)

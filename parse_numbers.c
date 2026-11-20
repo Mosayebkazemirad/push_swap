@@ -33,9 +33,7 @@ static int	read_digits(const char **str, long limit, int *number, int sign)
 	while (**str >= '0' && **str <= '9')
 	{
 		digit = **str - '0';
-		// اینجا لیمتون یه اینت مکس هست که منهای عدد میشه تقسیم بر ده 
-		// معنیش اینکه اگر به ولیو یک عدد دیگه اضافشه سریز میکنه  و از سریز جلوگیری میکنیم 
-		if (value > (limit - digit) / 10) 
+		if (value > (limit - digit) / 10)
 			return (0);
 		value = value * 10 + digit;
 		(*str)++;
@@ -59,11 +57,7 @@ int	ps_read_number(const char **str, int *number)
 			sign = -1;
 		(*str)++;
 	}
-	// این تکنیک استفاده شده برای اینکه اگر منفی شده اینت مین بفرستیم اگر مثبت بود اینت مکس بفرستیم
-	//اگر عدد منفی باشد چون در لانگ کست کردیم یه واخد اضافه میشه در فانکشن بعدی منفیش میکنم 
 	if (!read_digits(str, (long)INT_MAX + (sign < 0), number, sign))
 		return (0);
-	// اگر فانکشن قبلی برعکس تعیین شده میگه اگر صفره یک بفرست که اونجا برعکس بشه 
-	// پ خطا مخسوب نشه اگر فاصله است بازم درسته اگر فاصه نیست . صفرم نیست پس اشتباه 
 	return (!**str || ps_is_space(**str));
 }

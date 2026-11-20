@@ -32,10 +32,7 @@ static void	initialize_lis(t_sort_mark *work, int n)
 
 /* Prueft fuer den aktuellen Knoten alle vorherigen Knoten.
 ** Nur kleinere Raenge koennen Vorgaenger der LIS sein.
-** Der beste Vorgaenger wird ueber parent gespeichert. *//*
-این مثل یک دفترجه یاداشت عمل میکنه  میگرده و عدد های از کوچیک به بالا هستن رو پیدا میکنه
-و در دفترچه خودش ثبت میکنه میفرسته یه جای دیگه اونایی که کیپشون صفر مونده به ب انتقال میده
-*/
+** Der beste Vorgaenger wird ueber parent gespeichert. */
 static void	update_lis(t_stack *head, t_stack *node, t_sort_mark *work)
 {
 	t_stack	*scan;
@@ -66,14 +63,13 @@ void	mark_lis(t_stack *a, t_sort_mark *work, int size)
 	t_stack	*node;
 	int		best;
 	int		length;
-//مقدار همه رو صفر میذاریم
+
 	initialize_lis(work, size);
 	best = -1;
 	length = 0;
 	node = a;
-	while (node)// ۴ ۱ ۳ ۲ ۰
+	while (node)
 	{
-		//
 		update_lis(a, node, work);
 		if (work[node->rank].length > length)
 		{

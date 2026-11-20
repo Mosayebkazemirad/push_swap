@@ -51,16 +51,11 @@ void	sort_stack(t_stack **a, t_stack **b, const char *mode)
 
 	if (!a || !b || !*a)
 		return ;
-	// رتبه بندی می کنیم میفرستیم به فایل rating_buster
 	get_ranked(*a);
-	// میرم سراغ کرفتن درصد در فایلrating_buster
 	disorder = calc_disorder(*a);
-	// استراتژی رو پیدا میکنیم میفرستیم به بالای این همین صفحه
 	strategy = select_algo(mode, disorder);
-	// bench_state اینجا میگه اگر مد ادپایو هست یا مد انتخاب شده یک فرست به همراه استراتزیو درصد فایل
 	ps_bench_set(disorder, strategy,
 		!mode || same_word(mode, "--adaptive"));
-		// sort_small کنترل سریع میفرستیم به فایل
 	if (quick_check(a, b))
 		return ;
 	run_strategy(a, b, strategy);

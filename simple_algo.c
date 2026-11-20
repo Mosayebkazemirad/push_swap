@@ -37,9 +37,6 @@ static void	selection_sort(t_stack **a, t_stack **b)
 /* Simple behaelt die LIS in A und fuegt den Rest guenstig ein.
 ** Ohne Operationslimit; nur bei malloc-Fehler wird die alte
 ** Selection-Sort-Variante als speicherfreier Fallback genutzt. */
-/*
-
-*/
 void	simple_ranked(t_stack **a, t_stack **b)
 {
 	if (!sort_greedy(a, b, 0, 0))

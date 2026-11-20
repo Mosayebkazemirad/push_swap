@@ -36,26 +36,15 @@ static void	parse_argument(t_stack **stack, const char *str)
 	found = 0;
 	while (*str)
 	{
-		/*parse_numbers  کنترل فاصله و اسپیس میفرستیم برای این فایل*/
-
 		while (ps_is_space(*str))
 			str++;
 		if (!*str)
 			break ;
-
 		if (!ps_read_number(&str, &number))
 			ps_input_error(stack);
-		// میفرسیتیم برای اضافه کردن در فایل parse_stack
 		ps_append_number(stack, number);
 		found = 1;
 	}
-	/*
-	فرض کن فقط اسپیس باشه بعدش برنامه از بالا بریک میشه 
-	اگر found وجود نداشت،
-	 برنامه این ورودیِ خالی را به عنوان یک آرگومانِ سالم و بدون خطا قبول می‌کرد 
-	 (در حالی که طبق قوانین push_swap آرگومان خالی یا پر از فاصله باید Error بدهد).
-
-	*/
 	if (!found)
 		ps_input_error(stack);
 }

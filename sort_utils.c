@@ -22,7 +22,6 @@ int	abs_steps(int value)
 
 /* Wandelt einen Index in die kuerzere Drehrichtung um.
 ** Negativ bedeutet rueckwaerts rotieren. */
-// میخوام بفهمم صفر در نیمه بالاییه یا نمیه پایینی اگر پایینی بود عدد منفی میفرستیم اگ بالایی مثبت
 int	calc_rota_pos(int index, int size)
 {
 	if (index > size / 2)

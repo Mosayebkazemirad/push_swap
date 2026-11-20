@@ -27,9 +27,6 @@ void	ps_bench_begin(int enabled)
 	t_ps_bench	*bench;
 	int			i;
 
-	// میفرستیم فانکشن بالا تا یه لیست بسیازیم این یازده برای یازده حرکت ما هست
-	// فقط یک لیسته که ارایه کانت داره  برای یازده حرکت ما که مقدار صفر رو ابتدا به همه میدیم
-	//  بعد از مقدار دهی برمیگیردیم به فایل مین .
 	bench = ps_bench_data();
 	bench->enabled = enabled;
 	bench->optimizer_on = 0;
@@ -45,13 +42,11 @@ void	ps_bench_set(double disorder, int strategy, int adaptive)
 {
 	t_ps_bench	*bench;
 
-	// این داره میگه اگر بنچ انتخاب نشده ریترن کن.
 	bench = ps_bench_data();
 	if (!bench->enabled)
 		return ;
 	bench->disorder = disorder;
 	bench->strategy = strategy;
-	// اگر یک باشه یعنی مد انتخاب شدعه اگر صفر یعنی انتخاب نشده.
 	bench->adaptive = adaptive;
 }
 

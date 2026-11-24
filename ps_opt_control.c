@@ -44,7 +44,7 @@ void	ps_opt_finish(t_stack *a)
 
 static int	can_buffer(int kind)
 {
-	return ((kind == 0 || kind == 1 || kind == 5);
+	return ((kind == 0 || kind == 1 || kind == 5)
 		|| kind == 6 || kind == 8 || kind == 9);
 }
 

@@ -16,7 +16,7 @@
 
 static int	is_inverse(int left, int right)
 {
-	return ((left == 0 && right == 0) || (left == 1 && right == 1);
+	return ((left == 0 && right == 0) || (left == 1 && right == 1)
 		|| (left == 5 && right == 8) || (left == 8 && right == 5)
 	|| (left == 6 && right == 9) || (left == 9 && right == 6));
 }

@@ -16,10 +16,10 @@
 
 static int	is_strategy(char *arg)
 {
-	return (same_word(arg, "--simple");
+	return (same_word(arg, "--simple")
 		|| same_word(arg, "--medium")
 	|| same_word(arg, "--complex")
-	|| same_word(arg, "--adaptive"));
+	|| same_word(arg, "--adaptive") || same_word(arg,"--count_only"));
 }
 
 /* Entfernt die optionalen Flags aus argv, ohne Zahlen zu kopieren.
@@ -58,7 +58,6 @@ static int select_strategy(int * argc, char * *argv,
 ** Zahlen pruefen, sort_stack() starten und Speicher freigeben.
 ** stdout bleibt fuer Stack-OPs, stderr fuer Fehler und --bench.
 ** Ranking und Disorder werden von sort_stack() einmal bestimmt. */
-
 int	main(int argc, char **argv)
 {
 	t_stack		*stack_a;
@@ -77,6 +76,25 @@ int	main(int argc, char **argv)
 	stack_a = input_check(argc, argv);
 	if (!stack_a)
 		return (1);
+	if(same_word(mode,"--count_only"))
+	{
+		bench = argc - 1 ;
+		while(bench > 0)
+		{
+			char c ;
+			c = bench / 10 +'0';
+			write(1,&c,1);
+			if(bench <= 99)
+			{
+				c = bench % 10 + '0';
+				write(1,&c,1);
+				return(0);
+			}
+			bench /= 10;
+		}
+		return(0);
+
+	}
 	ps_bench_begin(bench);
 	sort_stack(&stack_a, &stack_b, mode);
 	ps_bench_print();
